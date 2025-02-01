@@ -3,6 +3,8 @@ package hiber.service;
 import hiber.dao.UserDao;
 import hiber.model.Car;
 import hiber.model.User;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,9 +29,14 @@ public class UserServiceImp implements UserService {
       return userDao.listUsers();
    }
 
+
+
+
+
    @Transactional(readOnly = true)
    @Override
    public User getUserByCarModelAndSeries(String model, int series) {
+//      return userDao.getUserByCarModelAndSeries(model, series);
       User user = userDao.getUserByCarModelAndSeries(model, series);
       if (user != null) {
          System.out.println("Пользователь найден: " + user);
@@ -37,5 +44,10 @@ public class UserServiceImp implements UserService {
          System.out.println("Пользователь с моделью автомобиля  '" + model + "' и серией '" + series + "' не найден.");
       }
       return user;
+   }
+
+   @Override
+   public void updateUser(User user) {
+      userDao.updateUser(user);
    }
 }

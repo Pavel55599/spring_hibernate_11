@@ -1,2 +1,9 @@
-# Project exclude paths
+# Exclude Maven target directory
 /target/
+
+/.mvn/wrapper
+
+/.idea
+
+target/
+

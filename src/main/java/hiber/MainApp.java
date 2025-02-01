@@ -1,12 +1,16 @@
-package hiber;
 
+package hiber;
 import hiber.config.AppConfig;
 import hiber.model.Car;
 import hiber.model.User;
+import hiber.service.CarService;
 import hiber.service.UserService;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-
 import java.util.List;
+import java.util.ArrayList;
+
+
+
 
 public class MainApp {
    public static void main(String[] args) {
@@ -14,46 +18,63 @@ public class MainApp {
               new AnnotationConfigApplicationContext(AppConfig.class);
 
       UserService userService = context.getBean(UserService.class);
+      CarService carService = context.getBean(CarService.class);
+
+      List<User> users = new ArrayList<>();
+      users.add(new User("ПАША", "ВОЛЯ", "ПАВЛИК@mail.com"));
+      users.add(new User("ИВАН", "ВЕТРОВ", "ИВАН@mail.com"));
+      users.add(new User("ФЕДОР", "ДОСТОЕВСКИЙ", "ФЕДЯ@mail.com"));
+      users.add(new User("АЛЕКСАНДР", "ПУШКИН", "САНЯ@mail.com"));
 
 
-      User user1 = new User("ПАША", "ВОЛЯ", "ПАВЛИК@mail.com");
-      Car car1 = new Car("жигули", 1985);
-      user1.setCar(car1);
-
-      User user2 = new User("ИВАН", "ВЕТРОВ", "ИВАН@mail.com");
-      Car car2 = new Car("МАЗДА", 3);
-      user2.setCar(car2);
-
-      User user3 = new User("ФЕДОР", "ДОСТОЕВСКИЙ", "ФЕДЯ@mail.com");
-      Car car3 = new Car("МЕРСЕДЕС", 600);
-      user3.setCar(car3);
-
-      User user4 = new User("АЛЕКСАНДР", "ПУШКИН", "САНЯ@mail.com");
-      Car car4 = new Car("ВОЛГА", 21);
-      user4.setCar(car4);
-
-      User user5 = new User("игорь", "васильев", "igor@gmail.com");
-      Car car5 = new Car("kamaz", 6500);
-      user5.setCar(car5);
-
-
-      userService.add(user1);
-      userService.add(user2);
-      userService.add(user3);
-      userService.add(user4);
-      userService.add(user5);
-
-
-      List<User> users = userService.listUsers();
+      System.out.println("Сохранение пользователей в БД");
       for (User user : users) {
+         userService.add(user);
+      }
+
+      List<Car> cars = new ArrayList<>();
+      cars.add(new Car("жигули", 1985));
+      cars.add(new Car("МАЗДА", 3));
+      cars.add(new Car("МЕРСЕДЕС", 600));
+      cars.add(new Car("ВОЛГА", 21));
+
+
+      System.out.println("Сохранение машин в БД");
+      for (Car car : cars) {
+         carService.add(car);
+      }
+
+      System.out.println("получение списка пользователей");
+      List<User> savedUsers = userService.listUsers();
+      List<Car> savedCars = carService.listCars();
+
+      System.out.println("список юзеров " + savedUsers);
+      System.out.println("список машин " + savedCars);
+
+      System.out.println("раздача машин");
+      assignCarsToUsers(savedUsers, savedCars);
+
+      System.out.println("Сохранение обновленных пользователей в БД");
+      for (User user : savedUsers) {
+         userService.updateUser(user);
+      }
+
+      for (User user : savedUsers) {
          System.out.println("Id = " + user.getId());
          System.out.println("First Name = " + user.getFirstName());
          System.out.println("Last Name = " + user.getLastName());
          System.out.println("Email = " + user.getEmail());
          System.out.println("Car = " + user.getCar());
          System.out.println();
+         System.out.println("_____________________________");
       }
 
+      for (Car car : savedCars) {
+         System.out.println("Id = " + car.getId());
+         System.out.println("Model = " + car.getModel());
+         System.out.println("Series = " + car.getSeries());
+         System.out.println();
+      }
 
       System.out.println("ВЫВОЖУ ПОЛЬЗОВАТЕЛЯ ПО АВТОМОБИЛЮ :" + userService.getUserByCarModelAndSeries("жигули", 1985));
       System.out.println("-----------------------------------");
@@ -63,11 +84,25 @@ public class MainApp {
       System.out.println("-----------------------------------");
       System.out.println("ВЫВОЖУ ПОЛЬЗОВАТЕЛЯ ПО АВТОМОБИЛЮ :" + userService.getUserByCarModelAndSeries("ВОЛГА", 21));
       System.out.println("-----------------------------------");
-      System.out.println("ВЫВОЖУ ПОЛЬЗОВАТЕЛЯ ПО АВТОМОБИЛЮ :" + userService.getUserByCarModelAndSeries("kamaz", 6500));
 
       context.close();
    }
+
+   public static void assignCarsToUsers(List<User> users, List<Car> cars) {
+      for (int i = 0; i < users.size(); i++) {
+         if (i < cars.size()) {
+            users.get(i).setCar(cars.get(i));
+         } else {
+            users.get(i).setCar(null);
+         }
+      }
+   }
 }
+
+
+//DELETE FROM cars;
+//SET SQL_SAFE_UPDATES = 0;
+
 
 
 
